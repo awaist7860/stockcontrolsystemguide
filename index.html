@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stock Control System Development Roadmap</title>
+<style>
+:root {
+  --bg:#f4f7fb; --panel:#ffffff; --ink:#172033; --muted:#667085; --line:#dbe3ee;
+  --blue:#1f4e79; --blue2:#2f75b5; --soft:#eaf2f8; --green:#15803d; --amber:#a16207; --red:#b42318;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(135deg,var(--blue),#173a5a);color:white;padding:38px 20px 32px}
+.wrap{max-width:1180px;margin:auto}
+h1{margin:0 0 8px;font-size:clamp(28px,5vw,46px);letter-spacing:-.03em}
+header p{margin:0;max-width:780px;color:#dce9f5;font-size:17px;line-height:1.55}
+.toolbar{display:grid;grid-template-columns:1.4fr .8fr .8fr;gap:10px;margin:20px 0}
+input,select,button,textarea{font:inherit}
+input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink)}
+button{border:0;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:650}
+button.primary{background:var(--blue2);color:white}
+button.secondary{background:#e7eef6;color:var(--blue)}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:-20px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 8px 24px rgba(31,78,121,.08)}
+.stat .n{font-size:28px;font-weight:800;margin-top:4px}
+.stat small{color:var(--muted)}
+.progress{height:12px;background:#e7edf4;border-radius:99px;overflow:hidden;margin:12px 0 4px}
+.progress > div{height:100%;width:0;background:var(--blue2);transition:.25s}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 24px}
+.phase{margin:28px 0}
+.phase-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px}
+.phase h2{margin:0;color:var(--blue);font-size:24px}
+.phase-count{color:var(--muted);font-size:14px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 3px 14px rgba(15,23,42,.04)}
+.card.complete{border-color:#86d7a2;background:#fbfffc}
+.card-top{display:flex;gap:12px;align-items:flex-start}
+.check{width:24px;height:24px;accent-color:var(--green);margin-top:2px;flex:0 0 auto}
+.step{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.card h3{margin:3px 0 8px;font-size:18px}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.badge{font-size:12px;border-radius:999px;padding:4px 8px;background:var(--soft);color:var(--blue)}
+.badge.high{background:#fee4e2;color:#b42318}
+.badge.medium{background:#fef0c7;color:#854a0e}
+.badge.low{background:#e7f5ec;color:#166534}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+summary{cursor:pointer;font-weight:650;color:var(--blue2)}
+.detail-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}
+.detail{background:#f8fafc;border-radius:10px;padding:10px;font-size:14px;line-height:1.5}
+.detail b{display:block;color:#344054;margin-bottom:3px}
+.status-row{display:grid;grid-template-columns:150px 1fr;gap:8px;margin-top:12px}
+.notes{width:100%;min-height:70px;padding:9px;border:1px solid var(--line);border-radius:10px;resize:vertical}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+footer{padding:35px 20px 50px;color:var(--muted);text-align:center}
+@media(max-width:800px){
+  .summary{grid-template-columns:repeat(2,1fr)}
+  .toolbar{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr}
+  .status-row{grid-template-columns:1fr}
+}
+@media print{
+  header{padding:20px;background:white;color:black}
+  header p{color:#333}
+  .summary{margin-top:0}
+  .toolbar,.controls,button{display:none!important}
+  body{background:white}
+  .card{break-inside:avoid;box-shadow:none}
+  details{display:block}
+  details>summary{display:none}
+  details>*{display:block!important}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Stock Control System Development Roadmap</h1>
+    <p>Build the system in small vertical slices. Start with Categories and prove the complete database → ASP.NET API → React flow before adding security or advanced features.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="summary">
+    <div class="stat"><small>Total milestones</small><div class="n" id="totalCount">35</div></div>
+    <div class="stat"><small>Complete</small><div class="n" id="completeCount">0</div></div>
+    <div class="stat"><small>In progress</small><div class="n" id="progressCount">0</div></div>
+    <div class="stat"><small>Overall progress</small><div class="n" id="percentCount">0%</div></div>
+  </section>
+  <div class="progress" aria-label="Overall roadmap progress"><div id="progressBar"></div></div>
+
+  <section class="toolbar">
+    <input id="search" type="search" placeholder="Search milestones, learning topics or completion checks...">
+    <select id="phaseFilter"><option value="">All phases</option></select>
+    <select id="statusFilter">
+      <option value="">All statuses</option>
+      <option>Not Started</option><option>In Progress</option><option>Blocked</option><option>Complete</option>
+    </select>
+  </section>
+
+  <div class="controls">
+    <button class="primary" id="exportBtn">Export progress JSON</button>
+    <button class="secondary" onclick="window.print()">Print / Save PDF</button>
+    <button class="secondary" id="resetBtn">Reset progress</button>
+  </div>
+
+  <section class="card" style="margin-bottom:22px">
+    <h3 style="margin-top:0">Recommended first target</h3>
+    <p style="margin-bottom:0;line-height:1.6"><b>PostgreSQL Categories table</b> → <b>ASP.NET Core connection</b> → <b>GET /api/categories</b> → <b>React displays Categories</b> → <b>complete Category CRUD</b>.</p>
+  </section>
+
+  <div id="roadmap"></div>
+</main>
+
+<footer>Progress is saved locally in this browser. No server or account is required.</footer>
+
+<script>
+const milestones = [{"step": 1, "phase": "Foundation", "title": "Preserve the legacy application", "build": "Keep the existing WinForms project as the historical prototype and create a safe place for the rebuild.", "learn": "Git branches, legacy vs new code, preserving working software", "check": "The old application is still available and the rebuild can be changed without breaking it.", "priority": "High"}, {"step": 2, "phase": "Foundation", "title": "Create the new project structure", "build": "Create clean backend, frontend, database/docs and legacy areas.", "learn": "Frontend vs backend vs database; repository organisation", "check": "A clean new project structure exists and each area has a clear purpose.", "priority": "High"}, {"step": 3, "phase": "Database Basics", "title": "Create the PostgreSQL development database", "build": "Create a development database such as stockcontrol_dev.", "learn": "PostgreSQL server, databases, connection basics", "check": "You can connect to the new development database with an administration tool.", "priority": "High"}, {"step": 4, "phase": "Database Basics", "title": "Create the Categories table", "build": "Create the first simple table and add a few test categories.", "learn": "Tables, columns, primary keys, data types, SELECT/INSERT/UPDATE/DELETE", "check": "SELECT returns the test categories correctly.", "priority": "High"}, {"step": 5, "phase": "Backend Basics", "title": "Create the ASP.NET Core Web API", "build": "Create the backend project without trying to add the full application yet.", "learn": "ASP.NET Core project structure, Web APIs", "check": "The API starts successfully and responds to a simple test endpoint.", "priority": "High"}, {"step": 6, "phase": "Backend Basics", "title": "Connect ASP.NET Core to PostgreSQL", "build": "Configure the backend to access PostgreSQL through Entity Framework Core.", "learn": "Connection strings, EF Core, DbContext, dependency injection", "check": "The backend can successfully access the development database.", "priority": "High"}, {"step": 7, "phase": "Backend Basics", "title": "Create GET /api/categories", "build": "Read Categories through the backend and return them as JSON.", "learn": "HTTP GET, controllers, endpoints, JSON, status codes", "check": "An API client/browser can retrieve the category list as JSON.", "priority": "High"}, {"step": 8, "phase": "Frontend Basics", "title": "Create the React + TypeScript frontend", "build": "Create a simple frontend application and page layout.", "learn": "React components, TypeScript basics, frontend project structure", "check": "The frontend runs successfully in a browser.", "priority": "High"}, {"step": 9, "phase": "Frontend Basics", "title": "Display Categories from the API", "build": "Call GET /api/categories from React and render the results.", "learn": "HTTP requests, async operations, browser dev tools, JSON rendering", "check": "Database categories appear in the browser through the API.", "priority": "High"}, {"step": 10, "phase": "First Vertical Slice", "title": "Complete Category CRUD", "build": "Add create, view, edit and delete for Categories across database, API and UI.", "learn": "POST, PUT, DELETE, forms, validation, end-to-end CRUD", "check": "Categories can be fully managed from the UI without direct database editing.", "priority": "High"}, {"step": 11, "phase": "Core Reference Data", "title": "Add Manufacturers", "build": "Repeat the Category pattern for manufacturers.", "learn": "Repetition of the full vertical-slice pattern", "check": "Manufacturers can be created, viewed, edited and deleted from the UI.", "priority": "High"}, {"step": 12, "phase": "Core Reference Data", "title": "Add Item Models and relationships", "build": "Create Item Models linked to Manufacturer and Category.", "learn": "Foreign keys, one-to-many relationships, joins, dropdowns", "check": "A model can be created by selecting a manufacturer and category.", "priority": "High"}, {"step": 13, "phase": "Asset Management", "title": "Build basic Assets", "build": "Create serialized asset records with asset tag, serial number, model and status.", "learn": "Entity design, unique fields, CRUD with relationships", "check": "Assets can be added, viewed, edited and searched.", "priority": "High"}, {"step": 14, "phase": "Asset Management", "title": "Add Organisations, Sites and Locations", "build": "Model where assets physically belong and are stored.", "learn": "Hierarchical data and relational structure", "check": "Each asset can be associated with a meaningful physical location.", "priority": "High"}, {"step": 15, "phase": "Asset Management", "title": "Add People", "build": "Create people records that assets can be assigned to.", "learn": "Reference entities, basic people data", "check": "People can be added, viewed and searched.", "priority": "High"}, {"step": 16, "phase": "Asset Management", "title": "Create Asset Assignments", "build": "Record assignment and return history instead of overwriting the current user.", "learn": "Business workflows, history tables, backend business logic", "check": "An asset can be assigned and returned while preserving full assignment history.", "priority": "High"}, {"step": 17, "phase": "Security", "title": "Add Authentication", "build": "Introduce login using ASP.NET Core Identity rather than a custom password table.", "learn": "Authentication, password hashing, sessions/cookies, secure login/logout", "check": "Unauthenticated users cannot access protected application areas.", "priority": "High"}, {"step": 18, "phase": "Security", "title": "Add Roles and Authorization", "build": "Create roles such as Administrator, Technician and ReadOnly and enforce them in the API.", "learn": "Authorization, role/policy checks, server-side permissions", "check": "A user cannot perform an API action they do not have permission for.", "priority": "High"}, {"step": 19, "phase": "Security", "title": "Add Audit Logging", "build": "Record important changes with user, entity, timestamp and before/after information.", "learn": "Traceability, auditing, accountability", "check": "Important changes can be traced back to who made them and when.", "priority": "High"}, {"step": 20, "phase": "Stock Management", "title": "Add quantity-based Stock", "build": "Add stock balances for consumable/non-serialized items.", "learn": "Serialized assets vs quantity stock", "check": "The system can show quantities of stock items by location.", "priority": "High"}, {"step": 21, "phase": "Stock Management", "title": "Add Stock Movements", "build": "Record receive, issue, return, transfer, adjustment and disposal transactions.", "learn": "Ledger/event history, transactional business logic", "check": "Current stock can be explained from its movement history.", "priority": "High"}, {"step": 22, "phase": "Usability", "title": "Improve Search", "build": "Create useful search across asset tag, serial, barcode, model, person and location.", "learn": "Search UX, query design, filtering", "check": "Users can find common records quickly without knowing database structure.", "priority": "Medium"}, {"step": 23, "phase": "Usability", "title": "Add Barcode Scanning", "build": "Use barcode input to open assets and speed up assignment/stock workflows.", "learn": "Scanner-as-keyboard workflows, lookup endpoints", "check": "Scanning a known barcode takes the user directly to the correct record/workflow.", "priority": "Medium"}, {"step": 24, "phase": "Data Import", "title": "Add Spreadsheet Import", "build": "Upload CSV/Excel, validate it, preview errors, then import approved records.", "learn": "File upload, validation, duplicate handling, safe import workflows", "check": "Bad rows are reported before import and valid data can be imported safely.", "priority": "Medium"}, {"step": 25, "phase": "Commercial Data", "title": "Add Suppliers", "build": "Create supplier records and link them to assets/purchases.", "learn": "Supplier reference data and relationships", "check": "Suppliers can be managed and referenced by other modules.", "priority": "Medium"}, {"step": 26, "phase": "Commercial Data", "title": "Add Purchasing", "build": "Introduce purchase orders and purchase order lines.", "learn": "Parent/child records, purchasing workflow, receiving", "check": "A purchase order can progress from order to received stock/assets.", "priority": "Medium"}, {"step": 27, "phase": "Asset Lifecycle", "title": "Add Repairs", "build": "Track faults, repair status, cost and resolution for assets.", "learn": "Lifecycle history, state transitions", "check": "An asset retains a complete repair history.", "priority": "Medium"}, {"step": 28, "phase": "Asset Lifecycle", "title": "Add Disposal", "build": "Create a controlled disposal workflow without deleting historical records.", "learn": "Soft lifecycle completion, records retention", "check": "Disposed assets remain reportable with disposal details.", "priority": "Medium"}, {"step": 29, "phase": "Reporting", "title": "Create the Dashboard", "build": "Show useful live totals, recent activity, repair counts and low-stock indicators.", "learn": "Aggregation, dashboard design, useful KPIs", "check": "Dashboard values are calculated from real application data.", "priority": "Medium"}, {"step": 30, "phase": "Reporting", "title": "Add Reports and Export", "build": "Add operational reports and later CSV/Excel/PDF/print output.", "learn": "Reporting queries, aggregation, exports", "check": "Core management questions can be answered without querying the database manually.", "priority": "Medium"}, {"step": 31, "phase": "Quality", "title": "Expand Automated Testing", "build": "Add tests for important business rules and permissions.", "learn": "Unit/integration testing, regression prevention", "check": "Critical workflows have repeatable automated tests.", "priority": "Medium"}, {"step": 32, "phase": "Deployment", "title": "Containerise with Docker", "build": "Containerise the frontend, API and PostgreSQL development/test stack.", "learn": "Images, containers, Docker Compose, environment configuration", "check": "The application stack can be started consistently with Docker.", "priority": "Low"}, {"step": 33, "phase": "Deployment", "title": "Deploy to an Ubuntu test server", "build": "Run the application behind HTTPS/reverse proxy on a Linux VM.", "learn": "Linux hosting, reverse proxy, TLS, environment separation", "check": "The application works from another device without exposing PostgreSQL directly.", "priority": "Low"}, {"step": 34, "phase": "DevOps", "title": "Add CI/CD", "build": "Automate build, tests, container creation and test deployment from GitHub.", "learn": "GitHub Actions, build pipelines, deployment automation", "check": "A normal code push can run validation and deploy to the test environment automatically.", "priority": "Low"}, {"step": 35, "phase": "Future", "title": "Evaluate advanced integrations", "build": "Only after the core system is stable, consider Entra ID, notifications, mobile/scanner UI, Power BI and other integrations.", "learn": "Integration planning and avoiding premature complexity", "check": "Each proposed integration has a clear business reason and can be added without destabilising the core system.", "priority": "Low"}];
+const STORAGE_KEY = "stock-control-roadmap-progress-v1";
+let state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+
+const phaseFilter = document.getElementById("phaseFilter");
+[...new Set(milestones.map(m=>m.phase))].forEach(p => {
+  const o=document.createElement("option"); o.value=p; o.textContent=p; phaseFilter.appendChild(o);
+});
+
+function getState(step) {
+  return state[step] || {status:"Not Started", done:false, notes:""};
+}
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  updateSummary();
+}
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function render() {
+  const q=document.getElementById("search").value.toLowerCase().trim();
+  const pf=phaseFilter.value, sf=document.getElementById("statusFilter").value;
+  const filtered=milestones.filter(m => {
+    const st=getState(m.step);
+    const hay=[m.title,m.phase,m.build,m.learn,m.check].join(" ").toLowerCase();
+    return (!q || hay.includes(q)) && (!pf || m.phase===pf) && (!sf || st.status===sf);
+  });
+  const root=document.getElementById("roadmap");
+  root.innerHTML="";
+  if(!filtered.length){ root.innerHTML='<div class="empty">No milestones match the current filters.</div>'; return; }
+  const phases=[...new Set(filtered.map(m=>m.phase))];
+  phases.forEach(phase => {
+    const items=filtered.filter(m=>m.phase===phase);
+    const section=document.createElement("section"); section.className="phase";
+    const complete=items.filter(m=>getState(m.step).status==="Complete").length;
+    section.innerHTML=`<div class="phase-head"><h2>${esc(phase)}</h2><div class="phase-count">${complete} / ${items.length} complete</div></div><div class="cards"></div>`;
+    const cards=section.querySelector(".cards");
+    items.forEach(m => {
+      const st=getState(m.step);
+      const card=document.createElement("article");
+      card.className="card "+(st.status==="Complete"?"complete":"");
+      card.innerHTML=`
+        <div class="card-top">
+          <input class="check" type="checkbox" ${st.status==="Complete"?"checked":""} aria-label="Mark step ${m.step} complete">
+          <div style="flex:1">
+            <div class="step">Step ${m.step}</div>
+            <h3>${esc(m.title)}</h3>
+            <div class="badges"><span class="badge ${m.priority.toLowerCase()}">${m.priority} priority</span><span class="badge">${esc(m.phase)}</span></div>
+          </div>
+        </div>
+        <details>
+          <summary>Milestone details</summary>
+          <div class="detail-grid">
+            <div class="detail"><b>What to build</b>${esc(m.build)}</div>
+            <div class="detail"><b>Learn / understand</b>${esc(m.learn)}</div>
+            <div class="detail"><b>Completion check</b>${esc(m.check)}</div>
+          </div>
+        </details>
+        <div class="status-row">
+          <select class="status" aria-label="Status for step ${m.step}">
+            <option ${st.status==="Not Started"?"selected":""}>Not Started</option>
+            <option ${st.status==="In Progress"?"selected":""}>In Progress</option>
+            <option ${st.status==="Blocked"?"selected":""}>Blocked</option>
+            <option ${st.status==="Complete"?"selected":""}>Complete</option>
+          </select>
+          <textarea class="notes" placeholder="Notes, what you learned, blocker, next action...">${esc(st.notes||"")}</textarea>
+        </div>`;
+      const checkbox=card.querySelector(".check"), select=card.querySelector(".status"), notes=card.querySelector(".notes");
+      checkbox.addEventListener("change",()=>{
+        state[m.step]={...getState(m.step),status:checkbox.checked?"Complete":"Not Started",done:checkbox.checked};
+        save(); render();
+      });
+      select.addEventListener("change",()=>{
+        state[m.step]={...getState(m.step),status:select.value,done:select.value==="Complete"};
+        save(); render();
+      });
+      notes.addEventListener("input",()=>{
+        state[m.step]={...getState(m.step),notes:notes.value};
+        save();
+      });
+      cards.appendChild(card);
+    });
+    root.appendChild(section);
+  });
+  updateSummary();
+}
+function updateSummary(){
+  const states=milestones.map(m=>getState(m.step));
+  const complete=states.filter(s=>s.status==="Complete").length;
+  const inprogress=states.filter(s=>s.status==="In Progress").length;
+  const pct=Math.round((complete/milestones.length)*100);
+  document.getElementById("completeCount").textContent=complete;
+  document.getElementById("progressCount").textContent=inprogress;
+  document.getElementById("percentCount").textContent=pct+"%";
+  document.getElementById("progressBar").style.width=pct+"%";
+}
+["search","phaseFilter","statusFilter"].forEach(id=>document.getElementById(id).addEventListener("input",render));
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  if(confirm("Reset all saved roadmap progress and notes?")){ state={}; save(); render(); }
+});
+document.getElementById("exportBtn").addEventListener("click",()=>{
+  const data={exportedAt:new Date().toISOString(),progress:state};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="stock-control-roadmap-progress.json"; a.click();
+  URL.revokeObjectURL(a.href);
+});
+render();
+</script>
+</body>
+</html>
