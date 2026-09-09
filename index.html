@@ -99,9 +99,25 @@ footer{padding:35px 20px 50px;color:var(--muted);text-align:center}
   </section>
 
   <div class="controls">
-    <button class="primary" id="exportBtn">Export progress JSON</button>
-    <button class="secondary" onclick="window.print()">Print / Save PDF</button>
-    <button class="secondary" id="resetBtn">Reset progress</button>
+    <button class="primary" id="exportBtn">
+        Export progress JSON
+    </button>
+
+    <button class="primary" id="saveOnlineBtn">
+        Save online
+    </button>
+
+    <button class="secondary" id="loadOnlineBtn">
+        Load online
+    </button>
+
+    <button class="secondary" onclick="window.print()">
+        Print / Save PDF
+    </button>
+
+    <button class="secondary" id="resetBtn">
+        Reset progress
+    </button>
   </div>
 
   <section class="card" style="margin-bottom:22px">
@@ -175,6 +191,88 @@ function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   updateSummary();
 }
+
+async function saveOnline() {
+    const message = document.getElementById("login-message");
+
+    const {
+        data: { user },
+        error: userError
+    } = await client.auth.getUser();
+
+    if (userError || !user) {
+        message.textContent = "Please sign in before saving online.";
+        return;
+    }
+
+    const { error } = await client
+        .from("tracker_progress")
+        .upsert(
+            {
+                user_id: user.id,
+                progress: state,
+                updated_at: new Date().toISOString()
+            },
+            {
+                onConflict: "user_id"
+            }
+        );
+
+    if (error) {
+        message.textContent =
+            `Online save failed: ${error.message}`;
+        return;
+    }
+
+    message.textContent = "Progress saved online successfully.";
+}
+
+async function loadOnline() {
+    const message = document.getElementById("login-message");
+
+    const {
+        data: { user },
+        error: userError
+    } = await client.auth.getUser();
+
+    if (userError || !user) {
+        message.textContent = "Please sign in before loading progress.";
+        return;
+    }
+
+    const { data, error } = await client
+        .from("tracker_progress")
+        .select("progress, updated_at")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+    if (error) {
+        message.textContent =
+            `Online load failed: ${error.message}`;
+        return;
+    }
+
+    if (!data) {
+        message.textContent =
+            "No online progress exists yet. Use Save online first.";
+        return;
+    }
+
+    state = data.progress || {};
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(state)
+    );
+
+    render();
+
+    message.textContent =
+        `Online progress loaded. Last saved: ${
+            new Date(data.updated_at).toLocaleString()
+        }`;
+}
+
 function esc(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
@@ -265,6 +363,15 @@ document.getElementById("exportBtn").addEventListener("click",()=>{
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="stock-control-roadmap-progress.json"; a.click();
   URL.revokeObjectURL(a.href);
 });
+
+document
+    .getElementById("saveOnlineBtn")
+    .addEventListener("click", saveOnline);
+
+document
+    .getElementById("loadOnlineBtn")
+    .addEventListener("click", loadOnline);
+
 render();
 </script>
 </body>
